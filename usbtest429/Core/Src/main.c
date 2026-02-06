@@ -101,17 +101,11 @@ int bcd_to_int(uint8_t bcd)
 void CDC_HANDLE (void)
 {
 
-//	uint16_t k =0;
-
-  //  char Buffer[10];
- //   char result[10];
-
 	switch (CDC_STATE)
 	{
 	case CDC_STATE_IDLE:
 	{
 		  USBH_CDC_Stop(&hUsbHostFS);
-		//  HAL_Delay (10);
 		  if (flag==1){
 			  CDC_STATE = CDC_SEND;
 		  }else{
@@ -126,12 +120,8 @@ HAL_Delay(500);
 	{
 		//	k++;
 		  USBH_CDC_Stop(&hUsbHostFS);
-
-
 		  usbresult = USBH_CDC_Receive(&hUsbHostFS, (uint8_t *) CDC_RX_Buffer, 5);
 		  HAL_UART_Transmit(&huart3,(uint8_t*)CDC_RX_Buffer, 5, 100);// ki a pc felé
-
-		//  HAL_Delay (10);
 		  if (flag==1){
 			  CDC_STATE = CDC_SEND;
 		  }else{
@@ -156,10 +146,6 @@ HAL_Delay(500);
 		for (j=0; j<64; j++){CDC_RX_Buffer[j]=0;}
 		CDC_STATE = CDC_RECEIVE;
 		flag=0;
-
-
-
-
 	default:
 		break;
 	}
@@ -410,7 +396,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
   if(GPIO_Pin == GPIO_PIN_13) {
 	  flag=1;
-	  CDC_STATE = CDC_SEND;
+	 // CDC_STATE = CDC_SEND;
 
 
   }}
