@@ -68,7 +68,7 @@ extern ApplicationTypeDef Appli_state;
 CDC_LineCodingTypeDef LineCoding;
 
 const uint16_t chnum=64;
-uint8_t CDC_RX_Buffer[5];
+uint8_t CDC_RX_Buffer[5]={0};
 uint8_t CDC_TX_Buffer[64];
 uint8_t usbresult;
 uint8_t sendresult;
@@ -108,8 +108,8 @@ void CDC_HANDLE (void)
 		  USBH_CDC_Stop(&hUsbHostFS);
 		  if (flag==1){
 			  CDC_STATE = CDC_SEND;
-		  }else{
-			  CDC_STATE = CDC_RECEIVE;
+		//  }else{
+		//	  CDC_STATE = CDC_RECEIVE;
 		  }
 
 HAL_Delay(500);
@@ -118,10 +118,16 @@ HAL_Delay(500);
 
 	case CDC_RECEIVE:
 	{
-		//	k++;
 		  USBH_CDC_Stop(&hUsbHostFS);
 		  usbresult = USBH_CDC_Receive(&hUsbHostFS, (uint8_t *) CDC_RX_Buffer, 5);
-		  HAL_UART_Transmit(&huart3,(uint8_t*)CDC_RX_Buffer, 5, 100);// ki a pc felé
+		  uint8_t INT[5];
+		  char buf[10];
+		  for(int p=0;p<5;p++){
+		  INT[p]=bcd_to_int(CDC_RX_Buffer[p]);//konvertálás
+		  }
+		  sprintf(buf, " %d%d%d%d\r\n", INT[0],INT[1],INT[2],INT[3]);//itt elhagyjuk a 3-ast és szépen összefűzzük a bullshit számokat egybe
+		  int number = atoi(buf);//ez lesz amiből feltételt képzünk, és itt már egy számunk van ami a freki
+		  HAL_UART_Transmit(&huart3,(uint8_t *)buf, strlen(buf), 100);// ki a pc felé
 		  if (flag==1){
 			  CDC_STATE = CDC_SEND;
 		  }else{
@@ -142,8 +148,8 @@ HAL_Delay(500);
 		CDC_TX_Buffer[3]=0;
 		CDC_TX_Buffer[4]=3;
 		USBH_CDC_Transmit (&hUsbHostFS, CDC_TX_Buffer, 5);
-		HAL_Delay (1);
-		for (j=0; j<64; j++){CDC_RX_Buffer[j]=0;}
+		HAL_Delay (100);
+	//	for (j=0; j<64; j++){CDC_RX_Buffer[j]=0;}
 		CDC_STATE = CDC_RECEIVE;
 		flag=0;
 	default:
